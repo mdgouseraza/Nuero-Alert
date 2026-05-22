@@ -28,28 +28,53 @@ const MOCK_NEWS_ARTICLES = [
 ];
 
 const MOCK_RECOMMENDATIONS = [
-  { priority: 'P1', target: 'Disaster Management Authority', recommendation: 'Activate emergency response teams in Karnataka and Kerala. Pre-position flood relief materials in Bengaluru North and Wayanad districts immediately. Deploy 12 NDRF battalions.', actionType: 'Deploy', urgency: 'HIGH' },
-  { priority: 'P2', target: 'State Police Forces', recommendation: 'Increase patrol presence in Maharashtra and UP districts showing unrest signals. Deploy rapid response units at key flashpoints. Coordinate with central forces for reinforcement.', actionType: 'Alert', urgency: 'MEDIUM' },
-  { priority: 'P3', target: 'Information & Broadcasting Ministry', recommendation: 'Issue public advisories countering misinformation spikes in Delhi and West Bengal. Activate verified communication channels. Schedule press briefings every 4 hours.', actionType: 'Communicate', urgency: 'MEDIUM' },
+  { priority:'P1', target:'Disaster Management Authority', recommendation:'Activate emergency response teams in Karnataka and Kerala. Pre-position flood relief materials in Bengaluru North and Wayanad districts immediately.', actionType:'Deploy', urgency:'HIGH' },
+  { priority:'P2', target:'State Police Forces', recommendation:'Increase patrol presence in Maharashtra and UP districts showing unrest signals. Deploy rapid response units at key flashpoints.', actionType:'Alert', urgency:'MEDIUM' },
+  { priority:'P3', target:'I&B Ministry', recommendation:'Issue public advisories countering misinformation spikes in Delhi. Activate verified communication channels on social media.', actionType:'Communicate', urgency:'MEDIUM' },
 ];
 
-export const MOCK_STATE_SCORES = {
-  'Karnataka':      { score: 78, emotion: 'Fear + Panic',   crisis: 'Flood Panic Risk',        trend: '↑ Rising',   newsCount: 8, redditCount: 12 },
-  'Maharashtra':    { score: 62, emotion: 'Anger + Unrest', crisis: 'Protest Activity',         trend: '↑ Rising',   newsCount: 6, redditCount: 9  },
-  'Delhi':          { score: 55, emotion: 'Anxiety',        crisis: 'Pollution + Civil Unrest', trend: '→ Stable',   newsCount: 5, redditCount: 7  },
-  'Tamil Nadu':     { score: 41, emotion: 'Panic',          crisis: 'Economic Stress',          trend: '↓ Falling',  newsCount: 3, redditCount: 4  },
-  'Kerala':         { score: 71, emotion: 'Fear',           crisis: 'Flood Emergency Risk',     trend: '↑ Rising',   newsCount: 7, redditCount: 10 },
-  'Telangana':      { score: 48, emotion: 'Anger',          crisis: 'Protest Signals',          trend: '→ Stable',   newsCount: 4, redditCount: 5  },
-  'Gujarat':        { score: 29, emotion: 'Calm',           crisis: 'Low Risk',                 trend: '↓ Falling',  newsCount: 2, redditCount: 2  },
-  'Uttar Pradesh':  { score: 67, emotion: 'Unrest',         crisis: 'Communal Tension Risk',    trend: '↑ Rising',   newsCount: 6, redditCount: 8  },
-  'West Bengal':    { score: 53, emotion: 'Anxiety',        crisis: 'Political Tension',        trend: '→ Stable',   newsCount: 4, redditCount: 6  },
-  'Rajasthan':      { score: 34, emotion: 'Anxiety',        crisis: 'Drought Stress',           trend: '→ Stable',   newsCount: 3, redditCount: 3  },
-  'Punjab':         { score: 44, emotion: 'Anger',          crisis: 'Farmer Protests',          trend: '↑ Rising',   newsCount: 4, redditCount: 5  },
-  'Bihar':          { score: 38, emotion: 'Anxiety',        crisis: 'Flood Preparedness',       trend: '→ Stable',   newsCount: 3, redditCount: 3  },
-  'Madhya Pradesh': { score: 31, emotion: 'Calm',           crisis: 'Low Risk',                 trend: '↓ Falling',  newsCount: 2, redditCount: 2  },
-  'Assam':          { score: 45, emotion: 'Fear',           crisis: 'Flood Watch',              trend: '→ Stable',   newsCount: 4, redditCount: 4  },
-  'Odisha':         { score: 36, emotion: 'Anxiety',        crisis: 'Cyclone Preparedness',     trend: '→ Stable',   newsCount: 3, redditCount: 3  },
+export const BASE_STATE_SCORES = {
+  'Karnataka':       { score:78, emotion:'Fear + Panic',   crisis:'Flood Panic Risk',        level:'HIGH',     trend:'↑', newsCount: 8, redditCount: 12 },
+  'Maharashtra':     { score:63, emotion:'Anger + Unrest', crisis:'Protest Activity',         level:'HIGH',     trend:'↑', newsCount: 6, redditCount: 9 },
+  'Delhi':           { score:55, emotion:'Anxiety',        crisis:'Pollution + Civil Unrest', level:'MEDIUM',   trend:'→', newsCount: 5, redditCount: 7 },
+  'Tamil Nadu':      { score:41, emotion:'Panic',          crisis:'Economic Stress',          level:'MEDIUM',   trend:'↓', newsCount: 3, redditCount: 4 },
+  'Kerala':          { score:74, emotion:'Fear',           crisis:'Flood Emergency Risk',     level:'HIGH',     trend:'↑', newsCount: 7, redditCount: 10 },
+  'Telangana':       { score:48, emotion:'Anger',          crisis:'Protest Signals',          level:'MEDIUM',   trend:'→', newsCount: 4, redditCount: 5 },
+  'Gujarat':         { score:28, emotion:'Calm',           crisis:'Low Risk',                 level:'LOW',      trend:'↓', newsCount: 2, redditCount: 2 },
+  'Uttar Pradesh':   { score:67, emotion:'Unrest',         crisis:'Communal Tension Risk',    level:'HIGH',     trend:'↑', newsCount: 6, redditCount: 8 },
+  'West Bengal':     { score:53, emotion:'Anxiety',        crisis:'Political Tension',        level:'MEDIUM',   trend:'→', newsCount: 4, redditCount: 6 },
+  'Rajasthan':       { score:34, emotion:'Anxiety',        crisis:'Drought Stress',           level:'MEDIUM',   trend:'→', newsCount: 3, redditCount: 3 },
+  'Punjab':          { score:44, emotion:'Anger',          crisis:'Farmer Protests',          level:'MEDIUM',   trend:'↑', newsCount: 4, redditCount: 5 },
+  'Bihar':           { score:38, emotion:'Anxiety',        crisis:'Flood Preparedness',       level:'MEDIUM',   trend:'→', newsCount: 3, redditCount: 3 },
+  'Madhya Pradesh':  { score:31, emotion:'Calm',           crisis:'Low Risk',                 level:'LOW',      trend:'↓', newsCount: 2, redditCount: 2 },
+  'Assam':           { score:46, emotion:'Fear',           crisis:'Flood Watch',              level:'MEDIUM',   trend:'→', newsCount: 4, redditCount: 4 },
+  'Odisha':          { score:37, emotion:'Anxiety',        crisis:'Cyclone Preparedness',     level:'MEDIUM',   trend:'→', newsCount: 3, redditCount: 3 },
+  'Jharkhand':       { score:29, emotion:'Calm',           crisis:'Low Risk',                 level:'LOW',      trend:'↓', newsCount: 1, redditCount: 1 },
+  'Chhattisgarh':    { score:33, emotion:'Anxiety',        crisis:'Infrastructure Stress',    level:'MEDIUM',   trend:'→', newsCount: 2, redditCount: 2 },
+  'Andhra Pradesh':  { score:42, emotion:'Anxiety',        crisis:'Economic Stress',          level:'MEDIUM',   trend:'→', newsCount: 3, redditCount: 3 },
+  'Himachal Pradesh':{ score:22, emotion:'Calm',           crisis:'Low Risk',                 level:'LOW',      trend:'↓', newsCount: 1, redditCount: 1 },
+  'Uttarakhand':     { score:35, emotion:'Fear',           crisis:'Landslide Watch',          level:'MEDIUM',   trend:'→', newsCount: 2, redditCount: 3 },
+  'Haryana':         { score:40, emotion:'Unrest',         crisis:'Protest Signals',          level:'MEDIUM',   trend:'→', newsCount: 2, redditCount: 4 },
+  'Goa':             { score:18, emotion:'Calm',           crisis:'Low Risk',                 level:'LOW',      trend:'↓', newsCount: 0, redditCount: 1 },
 };
+
+export const SIGNAL_POOL = [
+  { source:'Reddit', text:'Heavy flooding reported in North Bengaluru — r/bangalore',        emotion:'FEAR',    state:'Karnataka',    severity:'HIGH' },
+  { source:'News',   text:'IMD issues red alert for coastal Karnataka districts',             emotion:'PANIC',   state:'Karnataka',    severity:'HIGH' },
+  { source:'Trends', text:'"water shortage bengaluru" search volume up 340%',                emotion:'ANXIETY', state:'Karnataka',    severity:'MEDIUM' },
+  { source:'Reddit', text:'Mumbai protest march gaining momentum — r/india',                 emotion:'ANGER',   state:'Maharashtra',  severity:'MEDIUM' },
+  { source:'News',   text:'Delhi pollution: Schools shut, AQI at 450+',                      emotion:'ANXIETY', state:'Delhi',        severity:'HIGH' },
+  { source:'Reddit', text:'Fuel shortage panic spreading — r/indiaspeaks',                  emotion:'PANIC',   state:'Uttar Pradesh',severity:'MEDIUM' },
+  { source:'Trends', text:'"bandh tomorrow kolkata" search spike detected',                  emotion:'UNREST',  state:'West Bengal',  severity:'HIGH' },
+  { source:'News',   text:'Kerala: 3 districts on flood alert, evacuations begin',           emotion:'FEAR',    state:'Kerala',       severity:'CRITICAL' },
+  { source:'Reddit', text:'Hyderabad protest: Large crowds near Charminar — r/india',        emotion:'ANGER',   state:'Telangana',    severity:'MEDIUM' },
+  { source:'Trends', text:'"earthquake" search spike in Gujarat coastal region',             emotion:'FEAR',    state:'Gujarat',      severity:'LOW' },
+  { source:'News',   text:'UP: Internet suspended in 5 districts amid tension',              emotion:'UNREST',  state:'Uttar Pradesh',severity:'HIGH' },
+  { source:'Reddit', text:'Rajasthan drought: farmers block highway — r/india',              emotion:'ANGER',   state:'Rajasthan',    severity:'MEDIUM' },
+  { source:'Trends', text:'"cyclone odisha" searches rising sharply',                        emotion:'FEAR',    state:'Odisha',       severity:'MEDIUM' },
+  { source:'News',   text:'Punjab highway blockade resumes, commuters stranded',             emotion:'UNREST',  state:'Punjab',       severity:'MEDIUM' },
+  { source:'Reddit', text:'Bihar flood warning issued — multiple villages at risk',          emotion:'FEAR',    state:'Bihar',        severity:'HIGH' },
+];
 
 // ─── EMOTION ANALYSIS ─────────────────────────────────────────────────────────
 const EMOTION_KEYWORDS = {
@@ -157,27 +182,36 @@ const fetchNews = async () => {
   return MOCK_NEWS_ARTICLES;
 };
 
-// ─── GEMINI API ───────────────────────────────────────────────────────────────
-export const fetchGeminiRecommendations = async (topStates) => {
-  const key = import.meta.env.VITE_GEMINI_KEY;
+// ─── GROQ API ───────────────────────────────────────────────────────────────
+export const fetchGroqAnalysis = async (topStates) => {
+  const key = import.meta.env.VITE_GROQ_API_KEY;
   if (!key) return MOCK_RECOMMENDATIONS;
 
   try {
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`;
-    const prompt = `You are a crisis management AI for India. 
-    Current high-risk states: ${topStates.map(s => `${s.name} (Risk: ${s.score}%, Emotion: ${s.emotion})`).join(', ')}.
-    Provide exactly 3 specific, actionable crisis management recommendations for Indian authorities.
-    Respond ONLY with a JSON array, no markdown, no backticks. Format:
-    [{"priority":"P1","target":"Disaster Authority","recommendation":"...","actionType":"Deploy","urgency":"HIGH"},...]`;
-
-    const res = await fetch(GEMINI_URL, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama3-8b-8192',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an India crisis management AI. Always respond with valid JSON only, no markdown, no explanation.',
+          },
+          {
+            role: 'user',
+            content: `Crisis data: ${JSON.stringify(topStates)}. Give 3 recommendations as JSON array: [{"priority":"P1","target":"Authority Name","recommendation":"Action text","actionType":"Deploy","urgency":"HIGH"}]`,
+          },
+        ],
+        temperature: 0.4,
+        max_tokens: 600,
+      }),
     });
-    if (!res.ok) throw new Error('Gemini failed');
-    const data = await res.json();
-    const text = data.candidates[0].content.parts[0].text;
+    const data = await response.json();
+    const text = data.choices[0].message.content;
     const clean = text.replace(/```json|```/g, '').trim();
     return JSON.parse(clean);
   } catch {
@@ -202,7 +236,7 @@ const generateEmotionTrend = () => {
 
 // ─── MAIN HOOK ────────────────────────────────────────────────────────────────
 const useDataEngine = () => {
-  const [stateScores, setStateScores] = useState(MOCK_STATE_SCORES);
+  const [stateScores, setStateScores] = useState(BASE_STATE_SCORES);
   const [news, setNews] = useState(MOCK_NEWS_ARTICLES);
   const [redditPosts, setRedditPosts] = useState(MOCK_REDDIT_POSTS);
   const [recommendations, setRecommendations] = useState(MOCK_RECOMMENDATIONS);
@@ -218,7 +252,7 @@ const useDataEngine = () => {
     const stateData = {};
 
     // Initialize from mock
-    Object.entries(MOCK_STATE_SCORES).forEach(([state, data]) => {
+    Object.entries(BASE_STATE_SCORES).forEach(([state, data]) => {
       stateData[state] = { ...data, newsItems: [], redditItems: [] };
     });
 
@@ -247,7 +281,7 @@ const useDataEngine = () => {
           [...data.newsItems, ...data.redditItems].map(i => i.title || '').join(' ')
         );
         const emotionIntensity = { fear: 85, anger: 75, panic: 90, unrest: 70, anxiety: 60 }[dominantEmotion] || 50;
-        const newScore = calculateRiskScore(newsCount, MOCK_STATE_SCORES[state].score, emotionIntensity, 60);
+        const newScore = calculateRiskScore(newsCount, BASE_STATE_SCORES[state].score, emotionIntensity, 60);
         stateData[state] = {
           ...stateData[state],
           score: newScore,
@@ -289,13 +323,13 @@ const useDataEngine = () => {
       setTrendSpikes(prev => Math.max(18, prev + (Math.random() > 0.5 ? 1 : -1)));
       setAiPredictions(prev => prev + Math.floor(Math.random() * 3 + 1));
 
-      // Get top 3 states for Gemini
+      // Get top 3 states for Groq
       const topStates = Object.entries(processed)
         .sort((a, b) => b[1].score - a[1].score)
         .slice(0, 3)
         .map(([name, data]) => ({ name, score: data.score, emotion: data.emotion }));
 
-      const recs = await fetchGeminiRecommendations(topStates);
+      const recs = await fetchGroqAnalysis(topStates);
       setRecommendations(recs);
       setEmotionTrend(generateEmotionTrend());
       setLastUpdated(new Date());

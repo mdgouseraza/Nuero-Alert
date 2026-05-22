@@ -1,97 +1,98 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { SIGNAL_POOL } from '../hooks/useDataEngine';
 
-const SIGNAL_POOL = [
-  { source: 'Reddit', icon: '🔴', text: 'Spike in "flood" discussions — r/bangalore', emotion: 'FEAR', state: 'Karnataka', severity: 'HIGH' },
-  { source: 'News', icon: '📰', text: 'IMD issues red alert for coastal Karnataka', emotion: 'PANIC', state: 'Karnataka', severity: 'HIGH' },
-  { source: 'Trends', icon: '📈', text: '"water shortage bengaluru" search up 340%', emotion: 'ANXIETY', state: 'Karnataka', severity: 'MEDIUM' },
-  { source: 'Reddit', icon: '🔴', text: 'Mumbai protest march gaining traction — r/india', emotion: 'ANGER', state: 'Maharashtra', severity: 'MEDIUM' },
-  { source: 'News', icon: '📰', text: 'Delhi pollution: Schools shut, AQI at 450+', emotion: 'ANXIETY', state: 'Delhi', severity: 'HIGH' },
-  { source: 'Reddit', icon: '🔴', text: 'Fuel shortage panic reported — r/indiaspeaks', emotion: 'PANIC', state: 'UP', severity: 'MEDIUM' },
-  { source: 'Trends', icon: '📈', text: '"bandh tomorrow" search spiking in Kolkata', emotion: 'UNREST', state: 'West Bengal', severity: 'HIGH' },
-  { source: 'News', icon: '📰', text: 'Kerala: 3 districts on flood alert, evacuations begin', emotion: 'FEAR', state: 'Kerala', severity: 'CRITICAL' },
-  { source: 'Reddit', icon: '🔴', text: 'Hyderabad protest: Large crowds near Charminar', emotion: 'ANGER', state: 'Telangana', severity: 'MEDIUM' },
-  { source: 'Trends', icon: '📈', text: '"earthquake" search spike in Gujarat region', emotion: 'FEAR', state: 'Gujarat', severity: 'LOW' },
-  { source: 'News', icon: '📰', text: 'Punjab farmers block 3 national highways', emotion: 'ANGER', state: 'Punjab', severity: 'HIGH' },
-  { source: 'Reddit', icon: '🔴', text: 'Brahmaputra above danger level — Assam floods', emotion: 'FEAR', state: 'Assam', severity: 'CRITICAL' },
-  { source: 'Trends', icon: '📈', text: '"cyclone" alert trending in Odisha coastal belt', emotion: 'FEAR', state: 'Odisha', severity: 'MEDIUM' },
-  { source: 'News', icon: '📰', text: 'UP: Internet suspended in 5 districts amid tension', emotion: 'UNREST', state: 'Uttar Pradesh', severity: 'HIGH' },
-  { source: 'Reddit', icon: '🔴', text: 'Rajasthan drought: Farmers demand compensation', emotion: 'ANXIETY', state: 'Rajasthan', severity: 'MEDIUM' },
-];
+const SignalCard = ({ signal }) => {
+  const EMOTION_COLORS = {
+    FEAR:'#FF3B5C', ANGER:'#FF7043', PANIC:'#FFB020',
+    UNREST:'#B06EFF', ANXIETY:'#00C8FF',
+  };
+  const SEV_COLORS = { HIGH:'#FF3B5C', MEDIUM:'#FFB020', LOW:'#00E676', CRITICAL:'#FF3B5C' };
 
-const SEVERITY_COLORS = { CRITICAL: '#FF2D55', HIGH: '#FF6B35', MEDIUM: '#FFB800', LOW: '#00FF88' };
-const EMOTION_COLORS  = { FEAR: '#FF2D55', ANGER: '#FF6B35', PANIC: '#FFB800', UNREST: '#A855F7', ANXIETY: '#00C8FF' };
-
-const SignalItem = ({ signal, isNew }) => {
-  const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   return (
     <div style={{
-      padding: '10px 12px',
-      borderRadius: '8px',
-      background: 'rgba(10,22,40,0.8)',
-      border: `1px solid ${SEVERITY_COLORS[signal.severity]}22`,
-      borderLeft: `3px solid ${SEVERITY_COLORS[signal.severity]}`,
-      animation: isNew ? 'slide-in-left 0.35s ease' : 'none',
-      flexShrink: 0,
+      background:'var(--bg-panel)',
+      border:'1px solid var(--border-dim)',
+      borderLeft:`3px solid ${SEV_COLORS[signal.severity]}`,
+      borderRadius:'0 10px 10px 0',
+      padding:'10px 14px',
+      animation:'slide-in 0.3s ease',
+      marginBottom:8,
+      flexShrink: 0
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
-        <span style={{ fontSize: '11px' }}>{signal.icon}</span>
-        <span style={{ fontFamily: 'Share Tech Mono', color: 'var(--text-dim)', fontSize: '9px' }}>{time}</span>
-        <span style={{ fontFamily: 'Orbitron', color: SEVERITY_COLORS[signal.severity], fontSize: '8px', letterSpacing: '0.08em', marginLeft: 'auto' }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:6 }}>
+        <span style={{ fontFamily:'Share Tech Mono', fontSize:9, color:'var(--text-3)' }}>
+          {signal.source} · {signal.time}
+        </span>
+        <span style={{ fontSize:9, fontFamily:'Share Tech Mono', color:SEV_COLORS[signal.severity],
+          border:`1px solid ${SEV_COLORS[signal.severity]}33`, borderRadius:4, padding:'1px 6px' }}>
           {signal.severity}
         </span>
       </div>
-      <div style={{ fontFamily: 'Inter', color: 'var(--text-primary)', fontSize: '11px', lineHeight: 1.4, marginBottom: '6px' }}>
+      <div style={{ fontSize:12, color:'var(--text-1)', lineHeight:1.5, marginBottom:7 }}>
         {signal.text}
       </div>
-      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+      <div style={{ display:'flex', gap:6 }}>
         <span style={{
-          background: `${EMOTION_COLORS[signal.emotion] || '#7A9EC0'}18`,
-          border: `1px solid ${EMOTION_COLORS[signal.emotion] || '#7A9EC0'}44`,
-          borderRadius: '4px', padding: '1px 6px',
-          fontFamily: 'Share Tech Mono', color: EMOTION_COLORS[signal.emotion] || '#7A9EC0', fontSize: '8px',
-        }}>{signal.emotion}</span>
+          background:`${EMOTION_COLORS[signal.emotion]}18`,
+          border:`1px solid ${EMOTION_COLORS[signal.emotion]}44`,
+          color: EMOTION_COLORS[signal.emotion],
+          fontSize:9, fontFamily:'Share Tech Mono',
+          borderRadius:4, padding:'2px 7px',
+        }}>
+          {signal.emotion}
+        </span>
         <span style={{
-          background: 'rgba(0,200,255,0.08)', border: '1px solid rgba(0,200,255,0.2)',
-          borderRadius: '4px', padding: '1px 6px',
-          fontFamily: 'Share Tech Mono', color: 'var(--text-secondary)', fontSize: '8px',
-        }}>{signal.state}</span>
+          background:'rgba(255,255,255,0.04)', color:'var(--text-3)',
+          fontSize:9, fontFamily:'Share Tech Mono', borderRadius:4, padding:'2px 7px',
+        }}>
+          {signal.state}
+        </span>
       </div>
     </div>
   );
 };
 
 const LiveSignalFeed = () => {
-  const [signals, setSignals] = useState(() => SIGNAL_POOL.slice(0, 6).map((s, i) => ({ ...s, id: i, isNew: false })));
-  const counterRef = useRef(100);
+  const [signals, setSignals] = useState([]);
 
   useEffect(() => {
+    // Initial load
+    const initial = Array.from({ length: 4 }).map(() => ({
+      ...SIGNAL_POOL[Math.floor(Math.random() * SIGNAL_POOL.length)],
+      id: Math.random(),
+      time: new Date(Date.now() - Math.random() * 10000).toLocaleTimeString('en-IN', { hour12: false }),
+    }));
+    setSignals(initial);
+
+    // Add new signal every 4 seconds
     const interval = setInterval(() => {
-      const next = SIGNAL_POOL[Math.floor(Math.random() * SIGNAL_POOL.length)];
-      counterRef.current += 1;
-      setSignals(prev => {
-        const updated = [{ ...next, id: counterRef.current, isNew: true }, ...prev.slice(0, 7)];
-        return updated.map((s, i) => ({ ...s, isNew: i === 0 }));
-      });
+      const newSignal = {
+        ...SIGNAL_POOL[Math.floor(Math.random() * SIGNAL_POOL.length)],
+        id: Math.random(),
+        time: new Date().toLocaleTimeString('en-IN', { hour12: false }),
+      };
+      setSignals(prev => [newSignal, ...prev].slice(0, 8)); // Keep top 8
     }, 4000);
+
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      {/* Header */}
-      <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid var(--border-subtle)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FF2D55', animation: 'blink 1.2s infinite' }} />
-          <span className="section-label" style={{ fontSize: '10px' }}>LIVE SIGNAL FEED</span>
+    <div className="panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div>
+          <p className="panel-title">Live Signal Feed</p>
+          <p className="panel-sub">Real-time crisis telemetry stream</p>
         </div>
-        <div style={{ fontFamily: 'Inter', color: 'var(--text-dim)', fontSize: '9px' }}>
-          Auto-updating every 4 seconds
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#00C8FF', animation: 'blink-dot 1.5s infinite' }} />
+          <span style={{ fontFamily: 'Share Tech Mono', fontSize: 10, color: 'var(--text-3)' }}>LIVE</span>
         </div>
       </div>
-      {/* Feed */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {signals.map(signal => (
-          <SignalItem key={signal.id} signal={signal} isNew={signal.isNew} />
+      
+      <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4, minHeight: 0 }}>
+        {signals.map((sig) => (
+          <SignalCard key={sig.id} signal={sig} />
         ))}
       </div>
     </div>

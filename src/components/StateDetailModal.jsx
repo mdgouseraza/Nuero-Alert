@@ -5,20 +5,22 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts
 
 const EMOTION_COLORS = { Fear: '#FF2D55', Anger: '#FF6B35', Panic: '#FFB800', Unrest: '#A855F7', Anxiety: '#00C8FF', Hope: '#00FF88', Calm: '#3A6A9A' };
 
-const CircleGauge = ({ score, color }) => {
-  const r = 48, circ = 2 * Math.PI * r;
+const CircularGauge = ({ score, color }) => {
+  const r = 40, circ = 2 * Math.PI * r;
   const filled = (score / 100) * circ;
   return (
-    <svg width="120" height="120" viewBox="0 0 120 120">
-      <circle cx="60" cy="60" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
-      <circle cx="60" cy="60" r={r} fill="none" stroke={color} strokeWidth="10"
+    <svg width={100} height={100} viewBox="0 0 100 100">
+      <circle cx={50} cy={50} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
+      <circle cx={50} cy={50} r={r} fill="none" stroke={color} strokeWidth={8}
         strokeDasharray={`${filled} ${circ - filled}`}
-        strokeDashoffset={circ / 4}
         strokeLinecap="round"
-        style={{ filter: `drop-shadow(0 0 6px ${color})`, transition: 'stroke-dasharray 0.8s ease' }}
+        transform="rotate(-90 50 50)"
+        style={{ transition:'stroke-dasharray 0.6s ease' }}
       />
-      <text x="60" y="56" textAnchor="middle" style={{ fontFamily: 'Share Tech Mono', fill: color, fontSize: '22px' }}>{score}</text>
-      <text x="60" y="72" textAnchor="middle" style={{ fontFamily: 'Inter', fill: '#7A9EC0', fontSize: '10px' }}>/ 100</text>
+      <text x={50} y={50} textAnchor="middle" dy="0.35em"
+        style={{ fontFamily:'Share Tech Mono', fontSize:16, fill:color, fontWeight:'bold' }}>
+        {score}%
+      </text>
     </svg>
   );
 };
@@ -98,7 +100,7 @@ const StateDetailModal = ({ stateName, stateData, news, redditPosts, onClose }) 
           {/* Left column */}
           <div style={{ width: '220px', padding: '18px 16px', borderRight: `1px solid ${color}22`, display: 'flex', flexDirection: 'column', gap: '16px', flexShrink: 0, overflowY: 'auto' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-              <CircleGauge score={score} color={color} />
+              <CircularGauge score={score} color={color} />
               <div style={{ fontFamily: 'Share Tech Mono', color, fontSize: '10px' }}>CRISIS RISK SCORE</div>
               <div style={{ fontFamily: 'Inter', color: '#A855F7', fontSize: '10px' }}>{stateData?.emotion}</div>
               <div style={{ fontFamily: 'Share Tech Mono', color: stateData?.trend?.includes('↑') ? '#FF6B35' : '#00FF88', fontSize: '11px' }}>

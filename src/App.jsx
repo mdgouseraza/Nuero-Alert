@@ -29,8 +29,7 @@ function App() {
 
   return (
     <div className="app-layout">
-      {/* Scanline sweep */}
-      <div className="scanline" />
+
 
       {/* Navbar */}
       <Navbar stateScores={stateScores} isLoading={isLoading} lastUpdated={lastUpdated} />
@@ -46,7 +45,7 @@ function App() {
         />
 
         {/* Row 2 — Heatmap (60%) + Live Feed (38%) */}
-        <div style={{ display: 'flex', gap: '12px', height: '520px' }}>
+        <div style={{ display: 'flex', gap: '16px', height: '520px' }}>
           <div style={{ flex: '0 0 60%' }}>
             <IndiaHeatmap stateScores={stateScores} onStateClick={handleStateClick} />
           </div>
@@ -56,7 +55,7 @@ function App() {
         </div>
 
         {/* Row 3 — Crisis Alerts (22%) + Emotion Chart (44%) + AI Recs (30%) */}
-        <div style={{ display: 'flex', gap: '12px', height: '340px' }}>
+        <div style={{ display: 'flex', gap: '16px', height: '340px' }}>
           <div style={{ flex: '0 0 22%' }}>
             <CrisisAlertPanel stateScores={stateScores} />
           </div>

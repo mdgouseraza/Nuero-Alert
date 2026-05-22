@@ -6,90 +6,91 @@ const ALERT_DATA = [
     emotion: 'Fear + Panic',
     signals: ['IMD Red Alert issued', 'Reddit panic surge +340%', '"flood bengaluru" searches up'],
     recommendation: 'Activate disaster response teams',
+    aiExplanation: 'High velocity of distress signals correlated with IMD warnings suggests imminent infrastructure stress.',
   },
   {
     state: 'Kerala', emoji: '⛈️', crisisType: 'Flood Emergency Risk', riskScore: 71,
     emotion: 'Fear',
     signals: ['3 districts on red alert', 'Wayanad evacuation orders', 'River levels critical'],
     recommendation: 'Pre-position NDRF teams in Wayanad',
+    aiExplanation: 'Evacuation chatter peaking. Historical precedent indicates high probability of dam overflow within 24h.',
   },
   {
     state: 'Uttar Pradesh', emoji: '⚡', crisisType: 'Communal Tension Risk', riskScore: 67,
     emotion: 'Unrest',
     signals: ['Internet suspended 5 districts', 'Curfew imposed in 2 cities', 'Police deployment active'],
     recommendation: 'Increase intelligence surveillance',
+    aiExplanation: 'Sectarian keywords spiking on hyper-local channels. Rapid response unit deployment recommended.',
   },
 ];
 
+const AlertCard = ({ alert }) => {
+  const colors = { LOW:'#00E676', MEDIUM:'#FFB020', HIGH:'#FF7043', CRITICAL:'#FF3B5C' };
+  const c = colors[alert.riskLevel] || colors.MEDIUM;
+  
+  return (
+    <div style={{
+      background:'var(--bg-panel)',
+      border:`1px solid ${c}33`,
+      borderRadius:12, padding:'14px 16px', marginBottom:10,
+      animation: alert.riskLevel === 'CRITICAL' || alert.riskLevel === 'HIGH' ? 'glow-pulse 2.5s infinite' : 'none',
+      flexShrink: 0
+    }}>
+      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
+        <div style={{ fontFamily:'Orbitron', fontSize:12, color:c }}>
+          {alert.emoji} {alert.state}
+        </div>
+        <span style={{ fontFamily:'Share Tech Mono', fontSize:9, color:c,
+          background:`${c}15`, border:`1px solid ${c}44`, borderRadius:4, padding:'2px 8px' }}>
+          {alert.riskLevel}
+        </span>
+      </div>
+      <div style={{ fontSize:11, color:'var(--text-2)', marginBottom:8 }}>{alert.crisisType}</div>
+      {/* Progress bar */}
+      <div style={{ background:'rgba(255,255,255,0.06)', borderRadius:4, height:4, marginBottom:10 }}>
+        <div style={{ width:`${alert.riskScore}%`, height:'100%', background:c, borderRadius:4,
+          boxShadow:`0 0 6px ${c}66` }} />
+      </div>
+      <div style={{ fontSize:10, color:'var(--text-2)', lineHeight:1.6 }}>{alert.aiExplanation}</div>
+      <div style={{ marginTop:8, fontSize:10, color:c, fontFamily:'Share Tech Mono' }}>
+        → {alert.recommendation}
+      </div>
+    </div>
+  );
+};
+
 const CrisisAlertPanel = ({ stateScores }) => {
-  const dynamic = Object.entries(stateScores || {})
-    .filter(([, d]) => d.score >= 60)
+  const alerts = Object.entries(stateScores || {})
     .sort((a, b) => b[1].score - a[1].score)
     .slice(0, 3)
-    .map(([name, d]) => ({
-      state: name,
-      emoji: d.emotion?.toLowerCase().includes('fear') ? '🌊' : d.emotion?.toLowerCase().includes('anger') ? '⚡' : '🔥',
-      crisisType: d.crisis,
-      riskScore: d.score,
-      emotion: d.emotion,
-      signals: ALERT_DATA.find(a => a.state === name)?.signals || ['Signal detected', 'Monitoring active', 'Alert issued'],
-      recommendation: ALERT_DATA.find(a => a.state === name)?.recommendation || 'Monitor and prepare response',
-    }));
-
-  const alerts = dynamic.length > 0 ? dynamic : ALERT_DATA;
+    .map(([name, d]) => {
+      const { level } = getRiskLevel(d.score);
+      const fallback = ALERT_DATA.find(a => a.state === name);
+      return {
+        state: name,
+        emoji: d.emotion?.toLowerCase().includes('fear') ? '🌊' : d.emotion?.toLowerCase().includes('anger') ? '⚡' : '🔥',
+        crisisType: d.crisis,
+        riskScore: d.score,
+        riskLevel: level,
+        emotion: d.emotion,
+        signals: fallback?.signals || ['Signal detected', 'Monitoring active', 'Alert issued'],
+        recommendation: fallback?.recommendation || 'Monitor and prepare response',
+        aiExplanation: fallback?.aiExplanation || 'Automated anomaly detection triggered based on real-time signal aggregation.',
+      };
+    });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FF2D55', animation: 'blink 1.2s infinite' }} />
-        <span className="section-label" style={{ fontSize: '10px' }}>CRISIS ALERTS</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', height: '100%', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FF3B5C', animation: 'blink-dot 1.2s infinite' }} />
+        <span className="section-label">CRISIS ALERTS</span>
       </div>
 
-      {alerts.map((alert, i) => {
-        const { color } = getRiskLevel(alert.riskScore);
-        return (
-          <div key={alert.state} className="card" style={{
-            flex: 1, padding: '12px 14px',
-            borderLeft: `3px solid ${color}`,
-            animation: alert.riskScore >= 61 ? 'pulse-red 2.5s infinite' : 'none',
-            animationDelay: `${i * 0.4}s`,
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '14px' }}>{alert.emoji}</span>
-                <div>
-                  <div style={{ fontFamily: 'Orbitron', color, fontSize: '10px', letterSpacing: '0.08em' }}>{alert.state}</div>
-                  <div style={{ fontFamily: 'Inter', color: 'var(--text-secondary)', fontSize: '9px', marginTop: '1px' }}>{alert.crisisType}</div>
-                </div>
-              </div>
-              <div style={{ background: `${color}20`, border: `1px solid ${color}`, borderRadius: '4px', padding: '2px 7px', fontFamily: 'Share Tech Mono', color, fontSize: '9px' }}>
-                {getRiskLevel(alert.riskScore).level}
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
-                <span style={{ fontFamily: 'Share Tech Mono', color: 'var(--text-dim)', fontSize: '8px' }}>RISK SCORE</span>
-                <span style={{ fontFamily: 'Share Tech Mono', color, fontSize: '11px' }}>{alert.riskScore}%</span>
-              </div>
-              <div className="progress-bar-container">
-                <div className="progress-bar-fill" style={{ width: `${alert.riskScore}%`, background: `linear-gradient(90deg, ${color}88, ${color})` }} />
-              </div>
-            </div>
-
-            {alert.signals.map((s, si) => (
-              <div key={si} style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '2px' }}>
-                <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: color, flexShrink: 0 }} />
-                <span style={{ fontFamily: 'Inter', color: 'var(--text-secondary)', fontSize: '9px' }}>{s}</span>
-              </div>
-            ))}
-
-            <div style={{ marginTop: '6px', display: 'inline-block', background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.3)', borderRadius: '4px', padding: '2px 8px', fontFamily: 'Share Tech Mono', color: '#A855F7', fontSize: '8px' }}>
-              {alert.emotion}
-            </div>
-          </div>
-        );
-      })}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', paddingRight: '4px', minHeight: 0 }}>
+        {alerts.map((alert, i) => (
+          <AlertCard key={alert.state} alert={alert} />
+        ))}
+      </div>
     </div>
   );
 };
