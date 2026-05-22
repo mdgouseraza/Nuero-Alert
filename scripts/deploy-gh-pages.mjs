@@ -11,7 +11,11 @@ try {
   execSync('git init', { cwd: temp, stdio: 'inherit' });
   execSync('git add -A', { cwd: temp, stdio: 'inherit' });
   execSync('git commit -m "Deploy site from dist"', { cwd: temp, stdio: 'inherit' });
-  execSync('git push -f origin HEAD:gh-pages', {
+  const remote = execSync('git remote get-url origin', {
+    cwd: process.cwd(),
+    encoding: 'utf8',
+  }).trim();
+  execSync(`git push -f "${remote}" HEAD:gh-pages`, {
     cwd: temp,
     stdio: 'inherit',
     env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
