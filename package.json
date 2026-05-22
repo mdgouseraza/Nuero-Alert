@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build && cp dist/index.html dist/404.html && node scripts/deploy-gh-pages.mjs"
   },
   "dependencies": {
     "d3": "^7.9.0",
